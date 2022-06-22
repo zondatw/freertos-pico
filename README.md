@@ -34,6 +34,10 @@ because RP2040 is Arm Cortex-M0+ processor.
 
 > Designed by Raspberry Pi, RP2040 features a dual-core Arm Cortex-M0+ processor with 264KB internal RAM and support for up to 16MB of off-chip Flash. A wide range of flexible I/O options includes I2C, SPI, and — uniquely — Programmable I/O (PIO). These support endless possible applications for this small and affordable package.
 
+### FreeRTOSConfig.h
+
+copy from [official Customisation](https://www.freertos.org/a00110.html)
+
 ## Reference
 
 [How To Use FreeRTOS on the Raspberry Pi Pico (RP2040) Part 1: VSCode Setup and Blinky Test!](https://www.youtube.com/watch?v=jCZxStjzGA8)
