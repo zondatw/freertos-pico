@@ -36,7 +36,7 @@ because RP2040 is Arm Cortex-M0+ processor.
 
 ### FreeRTOSConfig.h
 
-copy from [official Customisation](https://www.freertos.org/a00110.html)
+copy from [official Customisation](https://www.freertos.org/a00110.html)，and modify some config.
 
 ## Reference
 
