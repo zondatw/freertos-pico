@@ -1,7 +1,7 @@
 #include <FreeRTOS.h>
-#include <task.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <task.h>
 #include "pico/stdlib.h"
 
 void led_task(void *p);
@@ -11,6 +11,7 @@ struct led_params {
     int on_delay;
     int off_delay;
 };
+
 int main()
 {
     struct led_params params = {
@@ -28,7 +29,7 @@ int main()
 
 void led_task(void *p)
 {
-    struct led_params *params = (struct led_params*)p;
+    struct led_params *params = (struct led_params *) p;
 
     gpio_init(params->gpio_pin);
     gpio_set_dir(params->gpio_pin, GPIO_OUT);
