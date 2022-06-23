@@ -9,6 +9,18 @@ cmake ..
 make
 ```
 
+## Debug
+
+### USB
+
+```shell
+// arch linux
+sudo pacman -S minicom
+
+// connect
+minicom -b 115200 -o -D /dev/ttyACM0
+```
+
 ## Setup Pico
 
 hold `BOOTSEL` and tap `RESET`, cp build/feature/led/led.uf2 file to pico's folder
@@ -40,5 +52,6 @@ copy from [official Customisation](https://www.freertos.org/a00110.html)，and m
 
 ## Reference
 
-[How To Use FreeRTOS on the Raspberry Pi Pico (RP2040) Part 1: VSCode Setup and Blinky Test!](https://www.youtube.com/watch?v=jCZxStjzGA8)
-[How to use FreeRTOS with the Raspberry Pi Pico](https://blog.smittytone.net/2022/02/24/how-to-use-freertos-with-the-raspberry-pi-pico/)
+[How To Use FreeRTOS on the Raspberry Pi Pico (RP2040) Part 1: VSCode Setup and Blinky Test!](https://www.youtube.com/watch?v=jCZxStjzGA8)  
+[How to use FreeRTOS with the Raspberry Pi Pico](https://blog.smittytone.net/2022/02/24/how-to-use-freertos-with-the-raspberry-pi-pico/)  
+[How to Setup Raspberry Pi Pico Serial Programming? USB Serial output](https://www.electronicshub.org/raspberry-pi-pico-serial-programming/)  
