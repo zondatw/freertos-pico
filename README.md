@@ -2,11 +2,13 @@
 
 ## Build
 
+Change DCMAKE_INSTALL_PREFIX to your path where pico on your computer
+
 ```shell
 mkdir build
 cd build
-cmake ..
-make
+cmake -DCMAKE_INSTALL_PREFIX=/run/media/zonda/RPI-RP2 ..
+make && make install
 ```
 
 ## Debug

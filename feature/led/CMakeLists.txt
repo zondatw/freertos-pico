@@ -9,3 +9,9 @@ pico_enable_stdio_usb(led 1)
 pico_enable_stdio_uart(led 0)
 
 pico_add_extra_outputs(led)
+
+# install
+
+install (FILES ${CMAKE_BINARY_DIR}/feature/led/led.uf2
+        DESTINATION ./
+)
