@@ -2,12 +2,13 @@
 
 ## Build
 
-Change DCMAKE_INSTALL_PREFIX to your path where pico on your computer
+Change DCMAKE_INSTALL_PREFIX to your path where pico on your computer.
+and change FEATURE value which you want use, current supported `led` and `dummy`.
 
 ```shell
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=/run/media/zonda/RPI-RP2 ..
+cmake -DCMAKE_INSTALL_PREFIX=/run/media/zonda/RPI-RP2 -DFEATURE=led ..
 make && make install
 ```
 
