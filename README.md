@@ -24,6 +24,14 @@ sudo pacman -S minicom
 minicom -b 115200 -o -D /dev/ttyACM0
 ```
 
+### UART
+
+```shell
+sudo pacman -S screen
+
+sudo screen /dev/ttyUSB0 115200
+```
+
 ## Setup Pico
 
 hold `BOOTSEL` and tap `RESET`, cp build/feature/led/led.uf2 file to pico's folder
