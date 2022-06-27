@@ -1,9 +1,11 @@
 #include <FreeRTOS.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <task.h>
 #include "pico/stdlib.h"
 
+int32_t debug_log(uart_inst_t *uart, const char *fmt, ...);
 void led_task(void *p);
 
 struct led_params {
@@ -43,13 +45,26 @@ void led_task(void *p)
 
     while (true) {
         gpio_put(params->gpio_pin, true);
-        printf("[LED] GPIO PIN %d ON\n", params->gpio_pin);
-        uart_puts(uart1, "[LED] ON\r\n");
+        debug_log(uart1, "[LED] GPIO PIN %d ON\r\n", params->gpio_pin);
         vTaskDelay(pdMS_TO_TICKS(params->on_delay));
 
         gpio_put(params->gpio_pin, false);
-        printf("[LED] GPIO PIN %d OFF\n", params->gpio_pin);
-        uart_puts(uart1, "[LED] OFF\r\n");
+        debug_log(uart1, "[LED] GPIO PIN %d OFF\r\n", params->gpio_pin);
         vTaskDelay(pdMS_TO_TICKS(params->off_delay));
     }
+}
+
+int32_t debug_log(uart_inst_t *uart, const char *fmt, ...)
+{
+    static char buf[1024];
+    int32_t ret;
+    va_list args;
+
+    va_start(args, fmt);
+    ret = vsprintf(buf, fmt, args);
+    va_end(args);
+
+    printf("%s", buf);
+    uart_puts(uart, buf);
+    return ret;
 }
