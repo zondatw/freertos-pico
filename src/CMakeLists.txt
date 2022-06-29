@@ -1,0 +1,12 @@
+SET(FEATURE "ALL" CACHE STRING "Choise FEATURE which you want to use")
+
+message("Feature flag `${FEATURE}`")
+if ((FEATURE STREQUAL "ALL") OR (FEATURE STREQUAL "led"))
+    message("Feature led on")
+    add_subdirectory(feature/led)
+endif()
+if ((FEATURE STREQUAL "ALL") OR (FEATURE STREQUAL "dummy"))
+    message("Feature dummy on")
+    add_subdirectory(feature/dummy)
+endif()
+unset(FEATURE CACHE)

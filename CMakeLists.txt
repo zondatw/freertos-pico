@@ -28,16 +28,4 @@ endif()
 pico_sdk_init()
 
 add_subdirectory(freertos)
-
-SET(FEATURE "ALL" CACHE STRING "Choise FEATURE which you want to use")
-
-message("Feature flag `${FEATURE}`")
-if ((FEATURE STREQUAL "ALL") OR (FEATURE STREQUAL "led"))
-    message("Feature led on")
-    add_subdirectory(src/feature/led)
-endif()
-if ((FEATURE STREQUAL "ALL") OR (FEATURE STREQUAL "dummy"))
-    message("Feature dummy on")
-    add_subdirectory(src/feature/dummy)
-endif()
-unset(FEATURE CACHE)
+add_subdirectory(src)
