@@ -12,6 +12,6 @@ pico_add_extra_outputs(dummy)
 
 # install
 
-install (FILES ${CMAKE_BINARY_DIR}/feature/dummy/dummy.uf2
+install (FILES ${CMAKE_BINARY_DIR}/src/feature/dummy/dummy.uf2
         DESTINATION ./
 )       

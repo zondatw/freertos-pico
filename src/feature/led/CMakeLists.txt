@@ -12,6 +12,6 @@ pico_add_extra_outputs(led)
 
 # install
 
-install (FILES ${CMAKE_BINARY_DIR}/feature/led/led.uf2
+install (FILES ${CMAKE_BINARY_DIR}/src/feature/led/led.uf2
         DESTINATION ./
 )
