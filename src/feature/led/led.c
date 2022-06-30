@@ -10,6 +10,7 @@
 void led_task(void *p);
 void send_task(void *p);
 void recv_task(void *p);
+void recv2_task(void *p);
 
 struct led_params {
     int gpio_pin;
@@ -19,6 +20,8 @@ struct led_params {
 
 struct queue_params {
     QueueHandle_t xqueue;
+    TaskHandle_t recv_task1;
+    TaskHandle_t recv_task2;
 };
 
 struct queue_item {
@@ -37,7 +40,10 @@ int main()
         .off_delay = 500,
     };
     struct queue_params qparmas = {
-        .xqueue = xQueueCreate(5, sizeof(struct queue_item))};
+        .xqueue = xQueueCreate(5, sizeof(struct queue_item)),
+        .recv_task1 = NULL,
+        .recv_task2 = NULL,
+    };
 
     // Set the GPIO pin mux to the UART 1 - 0 is TX, 1 is RX
     // Set the GPIO pin mux to the UART 2 - 8 is TX, 9 is RX
@@ -48,7 +54,10 @@ int main()
     if (qparmas.xqueue != NULL) {
         logger(LOG_INFO, uart1, "[Queue Init] create success\r\n");
         xTaskCreate(send_task, "Queue send task", 256, &qparmas, 1, NULL);
-        xTaskCreate(recv_task, "Queue recv task", 256, &qparmas, 1, NULL);
+        xTaskCreate(recv_task, "Queue recv task", 256, &qparmas, 1,
+                    &qparmas.recv_task1);
+        xTaskCreate(recv2_task, "Queue recv2 task", 256, &qparmas, 1,
+                    &qparmas.recv_task2);
     } else {
         logger(LOG_ERROR, uart1, "[Queue Init] create fail\r\n");
     }
@@ -85,6 +94,7 @@ void recv_task(void *p)
     const TickType_t ticks_to_wait = pdMS_TO_TICKS(100);
 
     while (true) {
+        vTaskDelay(pdMS_TO_TICKS(200));
         if (uxQueueMessagesWaiting(qparmas->xqueue) == 0) {
             // debug_log(uart1, "[Queue recv] recv empty\r\n");
             continue;
@@ -100,6 +110,29 @@ void recv_task(void *p)
     }
 }
 
+void recv2_task(void *p)
+{
+    struct queue_item item;
+    struct queue_params *qparmas = (struct queue_params *) p;
+    const TickType_t ticks_to_wait = pdMS_TO_TICKS(100);
+
+    while (true) {
+        vTaskDelay(pdMS_TO_TICKS(150));
+        if (uxQueueMessagesWaiting(qparmas->xqueue) == 0) {
+            // debug_log(uart1, "[Queue recv] recv empty\r\n");
+            continue;
+        }
+        BaseType_t status =
+            xQueueReceive(qparmas->xqueue, &item, ticks_to_wait);
+        if (status == pdTRUE) {
+            logger(LOG_DEBUG, uart1, "[Queue recv2] recv success\r\n");
+            logger(LOG_INFO, uart1, "[Queue recv2] recv: %d\r\n", item.id);
+        } else {
+            logger(LOG_WARNING, uart1, "[Queue recv2] recv fail\r\n");
+        }
+    }
+}
+
 void send_task(void *p)
 {
     int32_t count = 0;
@@ -110,6 +143,9 @@ void send_task(void *p)
         if (status != pdTRUE) {
             logger(LOG_WARNING, uart1, "[Queue send] send fail\r\n");
         }
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(100));
+        if (count == 50) {
+            vTaskDelete(qparmas->recv_task2);
+        }
     }
 }
