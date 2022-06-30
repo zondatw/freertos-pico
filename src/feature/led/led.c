@@ -145,6 +145,10 @@ void send_task(void *p)
         }
         vTaskDelay(pdMS_TO_TICKS(100));
         if (count == 50) {
+            vTaskSuspend(qparmas->recv_task2);
+        } else if (count == 150) {
+            vTaskResume(qparmas->recv_task2);
+        } else if (count == 200) {
             vTaskDelete(qparmas->recv_task2);
         }
     }
