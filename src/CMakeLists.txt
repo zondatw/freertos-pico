@@ -10,3 +10,5 @@ if ((FEATURE STREQUAL "ALL") OR (FEATURE STREQUAL "dummy"))
     add_subdirectory(feature/dummy)
 endif()
 unset(FEATURE CACHE)
+
+add_subdirectory(common)

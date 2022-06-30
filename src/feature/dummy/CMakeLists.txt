@@ -1,5 +1,5 @@
 add_executable(dummy
-        dummy.c
+    dummy.c
 )
 
 target_link_libraries(dummy pico_stdlib freertos)
@@ -13,5 +13,5 @@ pico_add_extra_outputs(dummy)
 # install
 
 install (FILES ${CMAKE_BINARY_DIR}/src/feature/dummy/dummy.uf2
-        DESTINATION ./
+    DESTINATION ./
 )       
