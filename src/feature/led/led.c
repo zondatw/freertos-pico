@@ -32,7 +32,7 @@ int main()
 {
     uart_init(uart1, 115200);
     stdio_init_all();
-    set_level(LOG_DEBUG);
+    logger_set_level(LOGGER_LEVEL_DEBUG);
 
     struct led_params params = {
         .gpio_pin = 9,

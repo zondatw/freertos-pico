@@ -2,7 +2,7 @@
 
 #include "logger.h"
 
-static int32_t log_level = LOG_NOTSET;
+static int32_t logger_level = LOGGER_LEVEL_NOTSET;
 
 #define uart_debug_log()                \
     do {                                \
@@ -17,21 +17,14 @@ static int32_t log_level = LOG_NOTSET;
         uart_puts(uart, buf);           \
     } while (0)
 
-int32_t debug_log(uart_inst_t *uart, const char *fmt, ...)
+void logger_set_level(int32_t level)
 {
-    int32_t ret;
-    uart_debug_log();
-    return ret;
+    logger_level = level;
 }
 
-void set_level(int32_t level)
+int32_t logger_log(int32_t level, uart_inst_t *uart, const char *fmt, ...)
 {
-    log_level = level;
-}
-
-int32_t logger(int32_t level, uart_inst_t *uart, const char *fmt, ...)
-{
-    if (level < log_level) {
+    if (level < logger_level) {
         return -1;
     }
 
