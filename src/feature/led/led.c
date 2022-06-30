@@ -29,6 +29,7 @@ int main()
 {
     uart_init(uart1, 115200);
     stdio_init_all();
+    set_level(LOG_DEBUG);
 
     struct led_params params = {
         .gpio_pin = 9,
@@ -45,10 +46,11 @@ int main()
 
 
     if (qparmas.xqueue != NULL) {
+        logger(LOG_INFO, uart1, "[Queue Init] create success\r\n");
         xTaskCreate(send_task, "Queue send task", 256, &qparmas, 1, NULL);
         xTaskCreate(recv_task, "Queue recv task", 256, &qparmas, 1, NULL);
     } else {
-        debug_log(uart1, "[Queue Init] create fail\r\n");
+        logger(LOG_ERROR, uart1, "[Queue Init] create fail\r\n");
     }
 
     xTaskCreate(led_task, "LED Task 1", 256, &params, 1, NULL);
@@ -67,11 +69,11 @@ void led_task(void *p)
 
     while (true) {
         gpio_put(params->gpio_pin, true);
-        debug_log(uart1, "[LED] GPIO PIN %d ON\r\n", params->gpio_pin);
+        logger(LOG_DEBUG, uart1, "[LED] GPIO PIN %d ON\r\n", params->gpio_pin);
         vTaskDelay(pdMS_TO_TICKS(params->on_delay));
 
         gpio_put(params->gpio_pin, false);
-        debug_log(uart1, "[LED] GPIO PIN %d OFF\r\n", params->gpio_pin);
+        logger(LOG_DEBUG, uart1, "[LED] GPIO PIN %d OFF\r\n", params->gpio_pin);
         vTaskDelay(pdMS_TO_TICKS(params->off_delay));
     }
 }
@@ -90,10 +92,10 @@ void recv_task(void *p)
         BaseType_t status =
             xQueueReceive(qparmas->xqueue, &item, ticks_to_wait);
         if (status == pdTRUE) {
-            debug_log(uart1, "[Queue recv] recv success\r\n");
-            debug_log(uart1, "[Queue recv] recv: %d\r\n", item.id);
+            logger(LOG_DEBUG, uart1, "[Queue recv] recv success\r\n");
+            logger(LOG_INFO, uart1, "[Queue recv] recv: %d\r\n", item.id);
         } else {
-            debug_log(uart1, "[Queue recv] recv fail\r\n");
+            logger(LOG_WARNING, uart1, "[Queue recv] recv fail\r\n");
         }
     }
 }
@@ -106,7 +108,7 @@ void send_task(void *p)
         struct queue_item item = {.id = count++};
         BaseType_t status = xQueueSendToBack(qparmas->xqueue, &item, 0);
         if (status != pdTRUE) {
-            debug_log(uart1, "[Queue send] send fail\r\n");
+            logger(LOG_WARNING, uart1, "[Queue send] send fail\r\n");
         }
         vTaskDelay(pdMS_TO_TICKS(500));
     }
