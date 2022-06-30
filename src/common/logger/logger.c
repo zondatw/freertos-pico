@@ -4,7 +4,7 @@
 
 static int32_t logger_level = LOGGER_LEVEL_NOTSET;
 
-#define uart_debug_log()                \
+#define debug_log()                     \
     do {                                \
         static char buf[1024];          \
         va_list args;                   \
@@ -29,6 +29,6 @@ int32_t logger_log(int32_t level, uart_inst_t *uart, const char *fmt, ...)
     }
 
     int32_t ret;
-    uart_debug_log();
+    debug_log();
     return ret;
 }
