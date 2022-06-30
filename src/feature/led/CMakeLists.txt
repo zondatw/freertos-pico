@@ -6,7 +6,7 @@ target_link_libraries(led
     PUBLIC
         pico_stdlib freertos
     PRIVATE
-        log
+        logger
 )
 
 # enable usb output, disable uart output

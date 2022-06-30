@@ -1,5 +1,5 @@
-#ifndef COMMON_LOG_H
-#define COMMON_LOG_H
+#ifndef COMMON_LOGGER_H
+#define COMMON_LOGGER_H
 
 #include <stdarg.h>
 #include "pico/stdlib.h"
@@ -24,4 +24,4 @@ void set_level(int32_t level);
 int32_t debug_log(uart_inst_t *uart, const char *fmt, ...);
 int32_t logger(int32_t level, uart_inst_t *uart, const char *fmt, ...);
 
-#endif  // COMMON_LOG_H
+#endif  // COMMON_LOGGER_H
