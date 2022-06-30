@@ -61,6 +61,14 @@ because RP2040 is Arm Cortex-M0+ processor.
 
 copy from [official Customisation](https://www.freertos.org/a00110.html)，and modify some config.
 
+## Coding
+
+### Format
+
+```
+find src/ -iname *.h -o -iname *.c | xargs clang-format -i
+```
+
 ## Reference
 
 [How To Use FreeRTOS on the Raspberry Pi Pico (RP2040) Part 1: VSCode Setup and Blinky Test!](https://www.youtube.com/watch?v=jCZxStjzGA8)  

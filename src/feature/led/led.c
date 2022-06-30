@@ -36,8 +36,7 @@ int main()
         .off_delay = 500,
     };
     struct queue_params qparmas = {
-        .xqueue = xQueueCreate(5, sizeof(struct queue_item))
-    };
+        .xqueue = xQueueCreate(5, sizeof(struct queue_item))};
 
     // Set the GPIO pin mux to the UART 1 - 0 is TX, 1 is RX
     // Set the GPIO pin mux to the UART 2 - 8 is TX, 9 is RX
@@ -82,13 +81,14 @@ void recv_task(void *p)
     struct queue_item item;
     struct queue_params *qparmas = (struct queue_params *) p;
     const TickType_t ticks_to_wait = pdMS_TO_TICKS(100);
-    
+
     while (true) {
         if (uxQueueMessagesWaiting(qparmas->xqueue) == 0) {
             // debug_log(uart1, "[Queue recv] recv empty\r\n");
             continue;
         }
-        BaseType_t status = xQueueReceive(qparmas->xqueue, &item, ticks_to_wait);
+        BaseType_t status =
+            xQueueReceive(qparmas->xqueue, &item, ticks_to_wait);
         if (status == pdTRUE) {
             debug_log(uart1, "[Queue recv] recv success\r\n");
             debug_log(uart1, "[Queue recv] recv: %d\r\n", item.id);
@@ -103,9 +103,7 @@ void send_task(void *p)
     int32_t count = 0;
     struct queue_params *qparmas = (struct queue_params *) p;
     while (true) {
-        struct queue_item item = {
-            .id = count++
-        };
+        struct queue_item item = {.id = count++};
         BaseType_t status = xQueueSendToBack(qparmas->xqueue, &item, 0);
         if (status != pdTRUE) {
             debug_log(uart1, "[Queue send] send fail\r\n");
