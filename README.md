@@ -3,7 +3,7 @@
 ## Build
 
 Change DCMAKE_INSTALL_PREFIX to your path where pico on your computer.
-and change FEATURE value which you want use, current supported `led` and `dummy`.
+and change FEATURE value which you want use, current supported `led`, `dummy` and `msg_queue`.
 
 ```shell
 mkdir build
