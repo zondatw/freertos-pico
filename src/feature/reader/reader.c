@@ -27,7 +27,7 @@ int mfrc522_set_bit_mask(uint8_t reg, uint8_t mask);
 int mfrc522_clear_bit_mask(uint8_t reg, uint8_t mask);
 
 int mfrc522_write_reg(uint8_t reg, uint8_t value);
-int mfrc522_read_reg(uint8_t reg, uint8_t *buf, uint16_t len);
+int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len);
 
 
 static inline void spi_cs_select();
@@ -66,22 +66,25 @@ int mfrc522_init(int32_t baudrate)
     logger_info(uart1, "[MFRC522 Init] start\r\n");
     stdio_init_all();
 
+    logger_info(uart1, "[MFRC522 Init] spi init\r\n");
+    spi_init(SPI_PORT, baudrate);
+
+    spi_set_format(
+        SPI_PORT,        // SPI instance
+        8,               // Number of bits per transfer
+        SPI_CPOL_0,      // Polarity (CPOL)
+        SPI_CPHA_0,      // Phase (CPHA)
+        SPI_MSB_FIRST);
+
     logger_info(uart1, "[MFRC522 Init] gpio seting\r\n");
     gpio_init(PIN_CS);
+    gpio_init(PIN_RST);
     gpio_set_dir(PIN_RST, GPIO_OUT);
     gpio_set_dir(PIN_CS, GPIO_OUT);
 
     gpio_put(PIN_RST, 0);
     spi_cs_deselect();
     gpio_put(PIN_RST, 1);
-
-    spi_init(SPI_PORT, baudrate);
-
-    spi_set_format( spi0,   // SPI instance
-                    8,      // Number of bits per transfer
-                    SPI_CPOL_0,      // Polarity (CPOL)
-                    SPI_CPHA_0,      // Phase (CPHA)
-                    SPI_MSB_FIRST);
 
     logger_info(uart1, "[MFRC522 Init] spi seting\r\n");
     gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
@@ -121,7 +124,7 @@ int mfrc522_write_reg(uint8_t reg, uint8_t value)
     return 0;
 }
 
-int mfrc522_read_reg(uint8_t reg, uint8_t *buf, uint16_t len)
+int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len)
 {
     uint8_t mag = ((reg << 1) & 0x7e) | 0x80;
 
