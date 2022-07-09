@@ -113,7 +113,8 @@ int mfrc522_reset()
 
 int mfrc522_write_reg(uint8_t reg, uint8_t value)
 {
-    uint8_t msg[2] = {(reg << 1) & 0x7e, value};
+    uint8_t msg[2] = {(reg << 1) & 0x7e,  // SPI address byte
+                      value};
 
     spi_cs_select();
 
@@ -125,7 +126,7 @@ int mfrc522_write_reg(uint8_t reg, uint8_t value)
 
 int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len)
 {
-    uint8_t mag = ((reg << 1) & 0x7e) | 0x80;
+    uint8_t mag = ((reg << 1) & 0x7e) | 0x80;  // SPI address byte
 
     spi_cs_select();
 
