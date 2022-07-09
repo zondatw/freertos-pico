@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <task.h>
-#include "pico/stdlib.h"
 #include "hardware/spi.h"
+#include "pico/stdlib.h"
 
 #include "logger.h"
 #include "mfrc522.h"
@@ -69,12 +69,11 @@ int mfrc522_init(int32_t baudrate)
     logger_info(uart1, "[MFRC522 Init] spi init\r\n");
     spi_init(SPI_PORT, baudrate);
 
-    spi_set_format(
-        SPI_PORT,        // SPI instance
-        8,               // Number of bits per transfer
-        SPI_CPOL_0,      // Polarity (CPOL)
-        SPI_CPHA_0,      // Phase (CPHA)
-        SPI_MSB_FIRST);
+    spi_set_format(SPI_PORT,    // SPI instance
+                   8,           // Number of bits per transfer
+                   SPI_CPOL_0,  // Polarity (CPOL)
+                   SPI_CPHA_0,  // Phase (CPHA)
+                   SPI_MSB_FIRST);
 
     logger_info(uart1, "[MFRC522 Init] gpio seting\r\n");
     gpio_init(PIN_CS);
