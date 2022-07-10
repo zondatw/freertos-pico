@@ -30,8 +30,8 @@ int mfrc522_write_reg(uint8_t reg, uint8_t value);
 int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len);
 
 
-static inline void spi_cs_select();
-static inline void spi_cs_deselect();
+static inline void mfrc522_spi_cs_select();
+static inline void mfrc522_spi_cs_deselect();
 
 // task
 void reader_task(void *p);
@@ -82,7 +82,7 @@ int mfrc522_init(int32_t baudrate)
     gpio_set_dir(PIN_CS, GPIO_OUT);
 
     gpio_put(PIN_RST, 0);
-    spi_cs_deselect();
+    mfrc522_spi_cs_deselect();
     gpio_put(PIN_RST, 1);
 
     logger_info(uart1, "[MFRC522 Init] spi seting\r\n");
@@ -116,11 +116,11 @@ int mfrc522_write_reg(uint8_t reg, uint8_t value)
     uint8_t msg[2] = {(reg << 1) & 0x7e,  // SPI address byte
                       value};
 
-    spi_cs_select();
+    mfrc522_spi_cs_select();
 
     spi_write_blocking(SPI_PORT, msg, 2);
 
-    spi_cs_deselect();
+    mfrc522_spi_cs_deselect();
     return 0;
 }
 
@@ -128,12 +128,12 @@ int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len)
 {
     uint8_t mag = ((reg << 1) & 0x7e) | 0x80;  // SPI address byte
 
-    spi_cs_select();
+    mfrc522_spi_cs_select();
 
     spi_write_blocking(SPI_PORT, &mag, 1);
     spi_read_blocking(SPI_PORT, 0, buf, len);
 
-    spi_cs_deselect();
+    mfrc522_spi_cs_deselect();
     return 0;
 }
 
