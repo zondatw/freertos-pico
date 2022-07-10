@@ -1,6 +1,8 @@
 #ifndef MRFC522_H
 #define MRFC522_H
 
+// PICC
+#define PICC_REQIDL 0x26
 
 // MI
 #define MI_OK 0x00
@@ -8,7 +10,9 @@
 #define MI_ERR 0x02
 
 // PCD
+#define PCD_IDLE 0x0
 #define PCD_TRANSCETIVE 0x0C
+#define PCD_AUTHENT 0x0E
 #define PCD_RESETPHASE 0x0F
 
 // FIFO
@@ -29,6 +33,7 @@
 #define TX_AUTO_REG 0x15
 #define MODE_REG 0x11
 #define TX_CONTROL_REG 0x14
+#define BIT_FRAMING_REG 0x0D
 
 
 #endif  // MRFC522_H
