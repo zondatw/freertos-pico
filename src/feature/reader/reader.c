@@ -29,8 +29,8 @@ int mfrc522_clear_bit_mask(uint8_t reg, uint8_t mask);
 int mfrc522_write_reg(uint8_t reg, uint8_t value);
 int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len);
 
-uint8_t mfrc522_request(uint8_t req_mode);
-uint8_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len);
+mifare_status_t mfrc522_request(uint8_t req_mode);
+mifare_status_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len);
 
 static inline void mfrc522_spi_cs_select();
 static inline void mfrc522_spi_cs_deselect();
@@ -101,12 +101,12 @@ int mfrc522_init(int32_t baudrate)
     logger_info(uart1, "[MFRC522 Init] init command start\r\n");
     // init command
     mfrc522_reset();
-    mfrc522_write_reg(T_MODE_REG, 0x8D);
-    mfrc522_write_reg(T_PRESCALER_REG, 0x3E);
-    mfrc522_write_reg(T_RELOAD_REG_L, 30);
-    mfrc522_write_reg(T_RELOAD_REG_H, 0);
-    mfrc522_write_reg(TX_AUTO_REG, 0x40);
-    mfrc522_write_reg(MODE_REG, 0x3D);
+    mfrc522_write_reg(MRFC522_T_MODE_REG, 0x8D);
+    mfrc522_write_reg(MRFC522_T_PRESCALER_REG, 0x3E);
+    mfrc522_write_reg(MRFC522_T_REALOD_L_REG, 30);
+    mfrc522_write_reg(MRFC522_T_RELOAD_H_REG, 0);
+    mfrc522_write_reg(MRFC522_TX_ASK_REG, 0x40);
+    mfrc522_write_reg(MRFC522_MODE_REG, 0x3D);
     mfrc522_antenna_on();
 
     return 0;
@@ -114,7 +114,7 @@ int mfrc522_init(int32_t baudrate)
 
 int mfrc522_reset()
 {
-    mfrc522_write_reg(COMMAND_REG, PCD_RESETPHASE);
+    mfrc522_write_reg(MRFC522_COMMAND_REG, PCD_SOFT_RESET);
     return 0;
 }
 
@@ -164,18 +164,18 @@ int mfrc522_antenna_on()
 {
     logger_info(uart1, "[MFRC522 antenna on] start\r\n");
     uint8_t buf[1];
-    mfrc522_read_reg(TX_CONTROL_REG, buf, 1);
+    mfrc522_read_reg(MRFC522_TX_CONTROL_REG, buf, 1);
     // buf[0] == 128
     logger_info(uart1, "[MFRC522 antenna on] read: %d\r\n", buf[0]);
     if (!(buf[0] & 0x03)) {
-        mfrc522_set_bit_mask(TX_CONTROL_REG, 0x03);
+        mfrc522_set_bit_mask(MRFC522_TX_CONTROL_REG, 0x03);
     }
     return 0;
 }
 
 int mfrc522_antenna_off()
 {
-    return mfrc522_clear_bit_mask(TX_CONTROL_REG, 0x03);
+    return mfrc522_clear_bit_mask(MRFC522_TX_CONTROL_REG, 0x03);
 }
 
 static inline void mfrc522_spi_cs_select()
@@ -192,31 +192,31 @@ static inline void mfrc522_spi_cs_deselect()
     asm volatile("nop \n nop \n nop");
 }
 
-uint8_t mfrc522_request(uint8_t req_mode)
+mifare_status_t mfrc522_request(uint8_t req_mode)
 {
     logger_debug(uart1, "[MFRC522 request] start\r\n");
-    mfrc522_write_reg(BIT_FRAMING_REG, 0x07);
+    mfrc522_write_reg(MRFC522_BIT_FRAMING_REG, 0x07);
 
     uint8_t tag_type[1] = {req_mode};
 
     uint8_t back_data[16];
     uint8_t back_bits;
-    uint8_t status = mfrc522_to_card(PCD_TRANSCETIVE, tag_type, 1, back_data, &back_bits);
-    if ((status != MI_OK) | (back_bits != 0x10)) {
-        return MI_ERR;
+    mifare_status_t status = mfrc522_to_card(PCD_TRANSCETIVE, tag_type, 1, back_data, &back_bits);
+    if ((status != MIFARE_OK) | (back_bits != 0x10)) {
+        return MIFARE_ERR;
     }
-    return MI_OK;
+    return MIFARE_OK;
 }
 
-uint8_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len)
+mifare_status_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len)
 {
-    uint8_t status = MI_ERR;
+    mifare_status_t status = MIFARE_ERR;
     uint8_t irq_en = 0x00;
     uint8_t wait_irq = 0x00;
     uint8_t last_bits = 0x00;
     uint8_t n = 0;
 
-    if (cmd == PCD_AUTHENT) {
+    if (cmd == PCD_MF_AUTHENT) {
         irq_en = 0x12;
         wait_irq = 0x10;
     } else if (cmd == PCD_TRANSCETIVE) {
@@ -228,16 +228,16 @@ uint8_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_da
     mfrc522_clear_bit_mask(0x04, 0x80);
     mfrc522_set_bit_mask(0x0A, 0x80);
 
-    mfrc522_write_reg(COMMAND_REG, PCD_IDLE);
+    mfrc522_write_reg(MRFC522_COMMAND_REG, PCD_IDLE);
 
     for (int i = 0; i < len; ++i) {
-        mfrc522_write_reg(FIFO_DATA_REG, buf[i]);
+        mfrc522_write_reg(MRFC522_FIFO_DATA_REG, buf[i]);
     }
 
-    mfrc522_write_reg(COMMAND_REG, cmd);
+    mfrc522_write_reg(MRFC522_COMMAND_REG, cmd);
 
     if (cmd == PCD_TRANSCETIVE) {
-        mfrc522_set_bit_mask(BIT_FRAMING_REG, 0x80);
+        mfrc522_set_bit_mask(MRFC522_BIT_FRAMING_REG, 0x80);
     }
 
     int index = 2000;
@@ -246,19 +246,19 @@ uint8_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_da
         index--;
     } while ((index != 0) && !(n & 0x01) && !(n & wait_irq));
 
-    mfrc522_clear_bit_mask(BIT_FRAMING_REG, 0x80);
+    mfrc522_clear_bit_mask(MRFC522_BIT_FRAMING_REG, 0x80);
 
     if (index) {
         uint8_t _buf;
-        mfrc522_read_reg(ERROR_REG, &_buf, 1);
+        mfrc522_read_reg(MRFC522_ERROR_REG, &_buf, 1);
         if ((_buf & 0x1B) == 0x00) {
-            status = MI_OK;
+            status = MIFARE_OK;
 
             if (n & irq_en & 0x01) {
-                status = MI_NOTAGERR;
+                status = MIFARE_NOTAGERR;
             } else if (cmd == PCD_TRANSCETIVE) {
-                mfrc522_read_reg(FIFO_LEVEL_REG, &n, 1);
-                mfrc522_read_reg(CONTROL_REG, &last_bits, 1);
+                mfrc522_read_reg(MRFC522_FIFO_LEVEL_REG, &n, 1);
+                mfrc522_read_reg(MRFC522_CONTROL_REG, &last_bits, 1);
                 last_bits &= 0x07;
 
                 if (last_bits != 0) {
@@ -275,14 +275,14 @@ uint8_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_da
 
                 logger_info(uart1, "[MFRC522 to card] ");
                 for (int i = 0; i < n; ++i) {
-                    mfrc522_read_reg(FIFO_DATA_REG, &back_data[i], 1);
+                    mfrc522_read_reg(MRFC522_FIFO_DATA_REG, &back_data[i], 1);
                     
                     logger_info(uart1, "%d ", back_data[i]);
                 }
                 logger_info(uart1, "\r\n");
             }
         } else {
-            status = MI_ERR;
+            status = MIFARE_ERR;
         }
     }
 
