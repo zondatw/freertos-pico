@@ -29,8 +29,8 @@ int mfrc522_clear_bit_mask(uint8_t reg, uint8_t mask);
 int mfrc522_write_reg(uint8_t reg, uint8_t value);
 int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len);
 
-int mfrc522_request(uint8_t req_mode);
-int mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len);
+uint8_t mfrc522_request(uint8_t req_mode);
+uint8_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len);
 
 static inline void mfrc522_spi_cs_select();
 static inline void mfrc522_spi_cs_deselect();
@@ -192,24 +192,24 @@ static inline void mfrc522_spi_cs_deselect()
     asm volatile("nop \n nop \n nop");
 }
 
-int mfrc522_request(uint8_t req_mode)
+uint8_t mfrc522_request(uint8_t req_mode)
 {
-    // logger_info(uart1, "[MFRC522 request] start\r\n");
-    int32_t status = 0;
-    int32_t back_bits = 0;
-
+    logger_debug(uart1, "[MFRC522 request] start\r\n");
     mfrc522_write_reg(BIT_FRAMING_REG, 0x07);
 
     uint8_t tag_type[1] = {req_mode};
 
-    mfrc522_to_card(PCD_TRANSCETIVE, tag_type, 1);
-    return 0;
+    uint8_t back_data[16];
+    uint8_t back_bits;
+    uint8_t status = mfrc522_to_card(PCD_TRANSCETIVE, tag_type, 1, back_data, &back_bits);
+    if ((status != MI_OK) | (back_bits != 0x10)) {
+        return MI_ERR;
+    }
+    return MI_OK;
 }
 
-int mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len)
+uint8_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len)
 {
-    uint8_t back_data[16];
-    uint8_t back_len = 0;
     uint8_t status = MI_ERR;
     uint8_t irq_en = 0x00;
     uint8_t wait_irq = 0x00;
@@ -262,9 +262,9 @@ int mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len)
                 last_bits &= 0x07;
 
                 if (last_bits != 0) {
-                    back_len = (n - 1) * 8 + last_bits;
+                    *back_len = (n - 1) * 8 + last_bits;
                 } else {
-                    back_len = n * 8;
+                    *back_len = n * 8;
                 }
 
                 if (n == 0) {
@@ -273,11 +273,11 @@ int mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len)
                     n = 16;
                 }
 
-                uint8_t _data;
                 logger_info(uart1, "[MFRC522 to card] ");
                 for (int i = 0; i < n; ++i) {
-                    mfrc522_read_reg(FIFO_DATA_REG, &_data, 1);
-                    logger_info(uart1, "%d ", _data);
+                    mfrc522_read_reg(FIFO_DATA_REG, &back_data[i], 1);
+                    
+                    logger_info(uart1, "%d ", back_data[i]);
                 }
                 logger_info(uart1, "\r\n");
             }
@@ -286,5 +286,5 @@ int mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len)
         }
     }
 
-    return 0;
+    return status;
 }
