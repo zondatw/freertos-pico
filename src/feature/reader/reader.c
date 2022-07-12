@@ -34,9 +34,9 @@ mifare_status_t mfrc522_to_card(uint8_t cmd,
                                 uint8_t *buf,
                                 uint8_t len,
                                 uint8_t *back_data,
-                                uint8_t *back_len);
+                                uint8_t *back_bits);
 mifare_status_t mfrc522_anticoll(uint8_t *back_data,
-                                 uint8_t *back_len);
+                                 uint8_t *back_bits);
 
 static inline void mfrc522_spi_cs_select();
 static inline void mfrc522_spi_cs_deselect();
@@ -75,8 +75,8 @@ void reader_task(void *p)
             logger_info(uart1, "[Reader Task] Card detected\r\n");
 
             uint8_t back_data[16];
-            uint8_t back_len;
-            status = mfrc522_anticoll(back_data, &back_len);
+            uint8_t back_bits;
+            status = mfrc522_anticoll(back_data, &back_bits);
         } else {
             continue;
         }
@@ -226,7 +226,7 @@ mifare_status_t mfrc522_request(uint8_t req_mode)
 
 
 mifare_status_t mfrc522_anticoll(uint8_t *back_data,
-                                 uint8_t *back_len)
+                                 uint8_t *back_bits)
 {
     logger_debug(uart1, "[MFRC522 anticoll] start\r\n");
     mfrc522_write_reg(MRFC522_BIT_FRAMING_REG, 0x00);
@@ -235,7 +235,7 @@ mifare_status_t mfrc522_anticoll(uint8_t *back_data,
     size_t tag_type_len = sizeof(tag_type) / sizeof(tag_type[0]);
 
     mifare_status_t status =
-        mfrc522_to_card(PCD_TRANSCETIVE, tag_type, tag_type_len, back_data, back_len);
+        mfrc522_to_card(PCD_TRANSCETIVE, tag_type, tag_type_len, back_data, back_bits);
 
     if (status != MIFARE_OK) {
         uint8_t serial_num_chk = 0;
@@ -254,7 +254,7 @@ mifare_status_t mfrc522_to_card(uint8_t cmd,
                                 uint8_t *buf,
                                 uint8_t len,
                                 uint8_t *back_data,
-                                uint8_t *back_len)
+                                uint8_t *back_bits)
 {
     mifare_status_t status = MIFARE_ERR;
     uint8_t irq_en = 0x00;
@@ -308,9 +308,9 @@ mifare_status_t mfrc522_to_card(uint8_t cmd,
                 last_bits &= 0x07;
 
                 if (last_bits != 0) {
-                    *back_len = (n - 1) * 8 + last_bits;
+                    *back_bits = (n - 1) * 8 + last_bits;
                 } else {
-                    *back_len = n * 8;
+                    *back_bits = n * 8;
                 }
 
                 if (n == 0) {
