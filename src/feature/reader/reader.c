@@ -206,11 +206,12 @@ mifare_status_t mfrc522_request(uint8_t req_mode)
     mfrc522_write_reg(MRFC522_BIT_FRAMING_REG, 0x07);
 
     uint8_t tag_type[1] = {req_mode};
+    size_t tag_type_len = sizeof(tag_type) / sizeof(tag_type[0]);
 
     uint8_t back_data[16];
     uint8_t back_bits;
     mifare_status_t status =
-        mfrc522_to_card(PCD_TRANSCETIVE, tag_type, 1, back_data, &back_bits);
+        mfrc522_to_card(PCD_TRANSCETIVE, tag_type, tag_type_len, back_data, &back_bits);
     if ((status != MIFARE_OK) | (back_bits != 0x10)) {
         return MIFARE_ERR;
     }
