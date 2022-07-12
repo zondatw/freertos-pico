@@ -30,7 +30,11 @@ int mfrc522_write_reg(uint8_t reg, uint8_t value);
 int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len);
 
 mifare_status_t mfrc522_request(uint8_t req_mode);
-mifare_status_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len);
+mifare_status_t mfrc522_to_card(uint8_t cmd,
+                                uint8_t *buf,
+                                uint8_t len,
+                                uint8_t *back_data,
+                                uint8_t *back_len);
 
 static inline void mfrc522_spi_cs_select();
 static inline void mfrc522_spi_cs_deselect();
@@ -201,14 +205,19 @@ mifare_status_t mfrc522_request(uint8_t req_mode)
 
     uint8_t back_data[16];
     uint8_t back_bits;
-    mifare_status_t status = mfrc522_to_card(PCD_TRANSCETIVE, tag_type, 1, back_data, &back_bits);
+    mifare_status_t status =
+        mfrc522_to_card(PCD_TRANSCETIVE, tag_type, 1, back_data, &back_bits);
     if ((status != MIFARE_OK) | (back_bits != 0x10)) {
         return MIFARE_ERR;
     }
     return MIFARE_OK;
 }
 
-mifare_status_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t *back_data, uint8_t *back_len)
+mifare_status_t mfrc522_to_card(uint8_t cmd,
+                                uint8_t *buf,
+                                uint8_t len,
+                                uint8_t *back_data,
+                                uint8_t *back_len)
 {
     mifare_status_t status = MIFARE_ERR;
     uint8_t irq_en = 0x00;
@@ -276,7 +285,7 @@ mifare_status_t mfrc522_to_card(uint8_t cmd, uint8_t *buf, uint8_t len, uint8_t 
                 logger_info(uart1, "[MFRC522 to card] ");
                 for (int i = 0; i < n; ++i) {
                     mfrc522_read_reg(MRFC522_FIFO_DATA_REG, &back_data[i], 1);
-                    
+
                     logger_info(uart1, "%d ", back_data[i]);
                 }
                 logger_info(uart1, "\r\n");
