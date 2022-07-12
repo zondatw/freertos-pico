@@ -89,6 +89,7 @@
 
 // PICC
 #define PICC_REQIDL 0x26
+#define PICC_ANTICOLL 0x93
 
 // Mifare status
 typedef enum { MIFARE_OK = 0, MIFARE_NOTAGERR, MIFARE_ERR } mifare_status_t;

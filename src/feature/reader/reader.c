@@ -35,6 +35,8 @@ mifare_status_t mfrc522_to_card(uint8_t cmd,
                                 uint8_t len,
                                 uint8_t *back_data,
                                 uint8_t *back_len);
+mifare_status_t mfrc522_anticoll(uint8_t *back_data,
+                                 uint8_t *back_len);
 
 static inline void mfrc522_spi_cs_select();
 static inline void mfrc522_spi_cs_deselect();
@@ -71,6 +73,10 @@ void reader_task(void *p)
         uint8_t status = mfrc522_request(PICC_REQIDL);
         if (status == MIFARE_OK) {
             logger_info(uart1, "[Reader Task] Card detected\r\n");
+
+            uint8_t back_data[16];
+            uint8_t back_len;
+            status = mfrc522_anticoll(back_data, &back_len);
         } else {
             continue;
         }
@@ -216,6 +222,32 @@ mifare_status_t mfrc522_request(uint8_t req_mode)
         return MIFARE_ERR;
     }
     return MIFARE_OK;
+}
+
+
+mifare_status_t mfrc522_anticoll(uint8_t *back_data,
+                                 uint8_t *back_len)
+{
+    logger_debug(uart1, "[MFRC522 anticoll] start\r\n");
+    mfrc522_write_reg(MRFC522_BIT_FRAMING_REG, 0x00);
+
+    uint8_t tag_type[2] = {PICC_ANTICOLL, 0x20};
+    size_t tag_type_len = sizeof(tag_type) / sizeof(tag_type[0]);
+
+    mifare_status_t status =
+        mfrc522_to_card(PCD_TRANSCETIVE, tag_type, tag_type_len, back_data, back_len);
+
+    if (status != MIFARE_OK) {
+        uint8_t serial_num_chk = 0;
+        for (uint8_t i = 0; i <= 3; ++i) {
+            serial_num_chk ^= back_data[i];
+        }
+        if (serial_num_chk != back_data[4]) {
+            return MIFARE_ERR;
+        }
+    }
+
+    return status;
 }
 
 mifare_status_t mfrc522_to_card(uint8_t cmd,
