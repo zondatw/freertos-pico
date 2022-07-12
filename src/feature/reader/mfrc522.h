@@ -91,10 +91,6 @@
 #define PICC_REQIDL 0x26
 
 // Mifare status
-typedef enum {
-    MIFARE_OK = 0,
-    MIFARE_NOTAGERR,
-    MIFARE_ERR
-} mifare_status_t;
+typedef enum { MIFARE_OK = 0, MIFARE_NOTAGERR, MIFARE_ERR } mifare_status_t;
 
 #endif  // MRFC522_H

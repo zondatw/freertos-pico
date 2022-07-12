@@ -68,7 +68,12 @@ void reader_task(void *p)
 
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(200));
-        mfrc522_request(PICC_REQIDL);
+        uint8_t status = mfrc522_request(PICC_REQIDL);
+        if (status == MIFARE_OK) {
+            logger_info(uart1, "[Reader Task] Card detected\r\n");
+        } else {
+            continue;
+        }
     }
 }
 
@@ -169,7 +174,6 @@ int mfrc522_antenna_on()
     logger_info(uart1, "[MFRC522 antenna on] start\r\n");
     uint8_t buf[1];
     mfrc522_read_reg(MRFC522_TX_CONTROL_REG, buf, 1);
-    // buf[0] == 128
     logger_info(uart1, "[MFRC522 antenna on] read: %d\r\n", buf[0]);
     if (!(buf[0] & 0x03)) {
         mfrc522_set_bit_mask(MRFC522_TX_CONTROL_REG, 0x03);
