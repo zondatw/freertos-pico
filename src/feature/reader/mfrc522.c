@@ -26,10 +26,10 @@ static inline void mfrc522_spi_cs_deselect();
 
 int mfrc522_init(int32_t baudrate)
 {
-    logger_info(uart1, "[MFRC522 Init] start\r\n");
+    logger_debug(uart1, "[MFRC522 Init] start\r\n");
     stdio_init_all();
 
-    logger_info(uart1, "[MFRC522 Init] spi init\r\n");
+    logger_debug(uart1, "[MFRC522 Init] spi init\r\n");
     spi_init(SPI_PORT, baudrate);
 
     spi_set_format(SPI_PORT,    // SPI instance
@@ -38,7 +38,7 @@ int mfrc522_init(int32_t baudrate)
                    SPI_CPHA_0,  // Phase (CPHA)
                    SPI_MSB_FIRST);
 
-    logger_info(uart1, "[MFRC522 Init] gpio seting\r\n");
+    logger_debug(uart1, "[MFRC522 Init] gpio seting\r\n");
     gpio_init(PIN_CS);
     gpio_init(PIN_RST);
     gpio_set_dir(PIN_RST, GPIO_OUT);
@@ -48,13 +48,13 @@ int mfrc522_init(int32_t baudrate)
     mfrc522_spi_cs_deselect();
     gpio_put(PIN_RST, 1);
 
-    logger_info(uart1, "[MFRC522 Init] spi seting\r\n");
+    logger_debug(uart1, "[MFRC522 Init] spi seting\r\n");
     gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
     gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
     gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
 
 
-    logger_info(uart1, "[MFRC522 Init] init command start\r\n");
+    logger_debug(uart1, "[MFRC522 Init] init command start\r\n");
     // init command
     mfrc522_reset();
     mfrc522_write_reg(MRFC522_T_MODE_REG, 0x8D);
@@ -118,10 +118,10 @@ int mfrc522_clear_bit_mask(uint8_t reg, uint8_t mask)
 
 int mfrc522_antenna_on()
 {
-    logger_info(uart1, "[MFRC522 antenna on] start\r\n");
+    logger_debug(uart1, "[MFRC522 antenna on] start\r\n");
     uint8_t buf[1];
     mfrc522_read_reg(MRFC522_TX_CONTROL_REG, buf, 1);
-    logger_info(uart1, "[MFRC522 antenna on] read: %d\r\n", buf[0]);
+    logger_debug(uart1, "[MFRC522 antenna on] read: %d\r\n", buf[0]);
     if (!(buf[0] & 0x03)) {
         mfrc522_set_bit_mask(MRFC522_TX_CONTROL_REG, 0x03);
     }
@@ -259,13 +259,13 @@ mifare_status_t mfrc522_to_card(uint8_t cmd,
                     n = 16;
                 }
 
-                logger_info(uart1, "[MFRC522 to card] ");
+                logger_debug(uart1, "[MFRC522 to card] ");
                 for (int i = 0; i < n; ++i) {
                     mfrc522_read_reg(MRFC522_FIFO_DATA_REG, &back_data[i], 1);
 
-                    logger_info(uart1, "%d ", back_data[i]);
+                    logger_debug(uart1, "%d ", back_data[i]);
                 }
-                logger_info(uart1, "\r\n");
+                logger_debug(uart1, "\r\n");
             }
         } else {
             status = MIFARE_ERR;

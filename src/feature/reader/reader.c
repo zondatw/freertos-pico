@@ -15,7 +15,7 @@ int main()
 {
     uart_init(uart1, 115200);
     stdio_init_all();
-    logger_set_level(LOGGER_LEVEL_DEBUG);
+    logger_set_level(LOGGER_LEVEL_INFO);
 
     // Set the GPIO pin mux to the UART 1 - 0 is TX, 1 is RX
     // Set the GPIO pin mux to the UART 2 - 8 is TX, 9 is RX
