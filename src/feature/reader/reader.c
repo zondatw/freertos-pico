@@ -35,6 +35,11 @@ void reader_task(void *p)
     vTaskDelay(pdMS_TO_TICKS(2000));
     mfrc522_init(1000000);
 
+    uint32_t valid_card_list[] = {
+        0x1B548050
+    };
+    int32_t valid_card_len = sizeof(valid_card_list) / sizeof(valid_card_list[0]);
+
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(200));
         uint8_t status = mfrc522_request(PICC_REQIDL);
@@ -53,7 +58,13 @@ void reader_task(void *p)
                     logger_info(uart1, "%02X", back_data[index]);
                 }
                 logger_info(uart1, "\r\n");
-                logger_info(uart1, "[Reader Task] UID NUM: %d\r\n", uid);
+                logger_info(uart1, "[Reader Task] UID NUM: %u\r\n", uid);
+
+                for (int32_t index = 0; index < valid_card_len; ++index) {
+                    if (valid_card_list[index] == uid) {
+                        logger_info(uart1, "[Reader Task] UID PASS\r\n");
+                    }
+                }
             }
         } else {
             continue;
