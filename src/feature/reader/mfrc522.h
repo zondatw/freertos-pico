@@ -1,6 +1,8 @@
 #ifndef MRFC522_H
 #define MRFC522_H
 
+#include "logger.h"
+
 // Command & status
 // page 0
 #define MRFC522_RESERVED_00 0x00
@@ -93,5 +95,16 @@
 
 // Mifare status
 typedef enum { MIFARE_OK = 0, MIFARE_NOTAGERR, MIFARE_ERR } mifare_status_t;
+
+// functions
+int mfrc522_init(int32_t baudrate);
+
+mifare_status_t mfrc522_request(uint8_t req_mode);
+mifare_status_t mfrc522_to_card(uint8_t cmd,
+                                uint8_t *buf,
+                                uint8_t len,
+                                uint8_t *back_data,
+                                uint8_t *back_bits);
+mifare_status_t mfrc522_anticoll(uint8_t *back_data, uint8_t *back_bits);
 
 #endif  // MRFC522_H

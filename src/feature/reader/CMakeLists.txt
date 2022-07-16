@@ -1,5 +1,6 @@
 add_executable(reader
     reader.c
+    mfrc522.c
 )
 
 target_link_libraries(reader
