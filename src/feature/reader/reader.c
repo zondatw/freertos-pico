@@ -47,10 +47,13 @@ void reader_task(void *p)
             if (status == MIFARE_OK) {
                 logger_info(uart1, "[Reader Task] UID: ");
                 int8_t back_data_len = (int8_t) (back_bits / 8);
+                uint32_t uid = 0;
                 for (int8_t index = back_data_len - 2; index >= 0; --index) {
+                    uid |= back_data[index] << (index * 8);
                     logger_info(uart1, "%02X", back_data[index]);
                 }
                 logger_info(uart1, "\r\n");
+                logger_info(uart1, "[Reader Task] UID NUM: %d\r\n", uid);
             }
         } else {
             continue;
