@@ -1,6 +1,8 @@
 #ifndef MRFC522_H
 #define MRFC522_H
 
+#include "hardware/spi.h"
+
 #include "logger.h"
 
 // Command & status
@@ -97,7 +99,8 @@
 typedef enum { MIFARE_OK = 0, MIFARE_NOTAGERR, MIFARE_ERR } mifare_status_t;
 
 // functions
-int mfrc522_init(int32_t baudrate,
+int mfrc522_init(spi_inst_t *spi_port,
+                 int32_t baudrate,
                  uint8_t sck_pin,
                  uint8_t mosi_pin,
                  uint8_t miso_pin,

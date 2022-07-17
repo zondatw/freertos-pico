@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <task.h>
 #include "pico/stdlib.h"
+#include "hardware/spi.h"
 
 #include "logger.h"
 #include "mfrc522.h"
@@ -33,7 +34,7 @@ int main()
 void reader_task(void *p)
 {
     vTaskDelay(pdMS_TO_TICKS(2000));
-    mfrc522_init(1000000, 2, 3, 4, 0, 1);
+    mfrc522_init(spi0, 1000000, 2, 3, 4, 0, 1);
 
     uint32_t valid_card_list[] = {0x1B548050};
     int32_t valid_card_len =

@@ -1,8 +1,4 @@
 #include "mfrc522.h"
-#include "hardware/spi.h"
-
-
-#define SPI_PORT spi0
 
 int mfrc522_reset();
 
@@ -23,14 +19,17 @@ static uint8_t mfrc522_mosi_pin;
 static uint8_t mfrc522_miso_pin;
 static uint8_t mfrc522_rst_pin;
 static uint8_t mfrc522_cs_pin;
+static spi_inst_t *mfrc522_spi_port;
 
-int mfrc522_init(int32_t baudrate,
+int mfrc522_init(spi_inst_t *spi_port,
+                 int32_t baudrate,
                  uint8_t sck_pin,
                  uint8_t mosi_pin,
                  uint8_t miso_pin,
                  uint8_t rst_pin,
                  uint8_t cs_pin)
 {
+    mfrc522_spi_port = spi_port;
     mfrc522_sck_pin = sck_pin;
     mfrc522_mosi_pin = mosi_pin;
     mfrc522_miso_pin = miso_pin;
@@ -41,9 +40,9 @@ int mfrc522_init(int32_t baudrate,
     stdio_init_all();
 
     logger_debug(uart1, "[MFRC522 Init] spi init\r\n");
-    spi_init(SPI_PORT, baudrate);
+    spi_init(mfrc522_spi_port, baudrate);
 
-    spi_set_format(SPI_PORT,    // SPI instance
+    spi_set_format(mfrc522_spi_port,    // SPI instance
                    8,           // Number of bits per transfer
                    SPI_CPOL_0,  // Polarity (CPOL)
                    SPI_CPHA_0,  // Phase (CPHA)
@@ -63,7 +62,6 @@ int mfrc522_init(int32_t baudrate,
     gpio_set_function(mfrc522_sck_pin, GPIO_FUNC_SPI);
     gpio_set_function(mfrc522_mosi_pin, GPIO_FUNC_SPI);
     gpio_set_function(mfrc522_miso_pin, GPIO_FUNC_SPI);
-
 
     logger_debug(uart1, "[MFRC522 Init] init command start\r\n");
     // init command
@@ -92,7 +90,7 @@ int mfrc522_write_reg(uint8_t reg, uint8_t value)
 
     mfrc522_spi_cs_select();
 
-    spi_write_blocking(SPI_PORT, msg, 2);
+    spi_write_blocking(mfrc522_spi_port, msg, 2);
 
     mfrc522_spi_cs_deselect();
     return 0;
@@ -104,8 +102,8 @@ int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len)
 
     mfrc522_spi_cs_select();
 
-    spi_write_blocking(SPI_PORT, &mag, 1);
-    spi_read_blocking(SPI_PORT, 0, buf, len);
+    spi_write_blocking(mfrc522_spi_port, &mag, 1);
+    spi_read_blocking(mfrc522_spi_port, 0, buf, len);
 
     mfrc522_spi_cs_deselect();
     return 0;
