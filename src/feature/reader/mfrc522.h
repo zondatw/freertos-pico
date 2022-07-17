@@ -97,7 +97,12 @@
 typedef enum { MIFARE_OK = 0, MIFARE_NOTAGERR, MIFARE_ERR } mifare_status_t;
 
 // functions
-int mfrc522_init(int32_t baudrate);
+int mfrc522_init(int32_t baudrate,
+                 uint8_t sck_pin,
+                 uint8_t mosi_pin,
+                 uint8_t miso_pin,
+                 uint8_t rst_pin,
+                 uint8_t cs_pin);
 
 mifare_status_t mfrc522_request(uint8_t req_mode);
 mifare_status_t mfrc522_to_card(uint8_t cmd,

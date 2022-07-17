@@ -4,12 +4,6 @@
 
 #define SPI_PORT spi0
 
-#define PIN_SCK 2
-#define PIN_MOSI 3
-#define PIN_MISO 4
-#define PIN_RST 0
-#define PIN_CS 1
-
 int mfrc522_reset();
 
 int mfrc522_antenna_on();
@@ -24,8 +18,25 @@ int mfrc522_read_reg(uint8_t reg, uint8_t *buf, size_t len);
 static inline void mfrc522_spi_cs_select();
 static inline void mfrc522_spi_cs_deselect();
 
-int mfrc522_init(int32_t baudrate)
+static uint8_t mfrc522_sck_pin;
+static uint8_t mfrc522_mosi_pin;
+static uint8_t mfrc522_miso_pin;
+static uint8_t mfrc522_rst_pin;
+static uint8_t mfrc522_cs_pin;
+
+int mfrc522_init(int32_t baudrate,
+                 uint8_t sck_pin,
+                 uint8_t mosi_pin,
+                 uint8_t miso_pin,
+                 uint8_t rst_pin,
+                 uint8_t cs_pin)
 {
+    mfrc522_sck_pin = sck_pin;
+    mfrc522_mosi_pin = mosi_pin;
+    mfrc522_miso_pin = miso_pin;
+    mfrc522_rst_pin = rst_pin;
+    mfrc522_cs_pin = cs_pin;
+
     logger_debug(uart1, "[MFRC522 Init] start\r\n");
     stdio_init_all();
 
@@ -39,19 +50,19 @@ int mfrc522_init(int32_t baudrate)
                    SPI_MSB_FIRST);
 
     logger_debug(uart1, "[MFRC522 Init] gpio seting\r\n");
-    gpio_init(PIN_CS);
-    gpio_init(PIN_RST);
-    gpio_set_dir(PIN_RST, GPIO_OUT);
-    gpio_set_dir(PIN_CS, GPIO_OUT);
+    gpio_init(mfrc522_cs_pin);
+    gpio_init(mfrc522_rst_pin);
+    gpio_set_dir(mfrc522_rst_pin, GPIO_OUT);
+    gpio_set_dir(mfrc522_cs_pin, GPIO_OUT);
 
-    gpio_put(PIN_RST, 0);
+    gpio_put(mfrc522_rst_pin, 0);
     mfrc522_spi_cs_deselect();
-    gpio_put(PIN_RST, 1);
+    gpio_put(mfrc522_rst_pin, 1);
 
     logger_debug(uart1, "[MFRC522 Init] spi seting\r\n");
-    gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
-    gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
-    gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
+    gpio_set_function(mfrc522_sck_pin, GPIO_FUNC_SPI);
+    gpio_set_function(mfrc522_mosi_pin, GPIO_FUNC_SPI);
+    gpio_set_function(mfrc522_miso_pin, GPIO_FUNC_SPI);
 
 
     logger_debug(uart1, "[MFRC522 Init] init command start\r\n");
@@ -136,14 +147,14 @@ int mfrc522_antenna_off()
 static inline void mfrc522_spi_cs_select()
 {
     asm volatile("nop \n nop \n nop");
-    gpio_put(PIN_CS, 0);  // Active low
+    gpio_put(mfrc522_cs_pin, 0);  // Active low
     asm volatile("nop \n nop \n nop");
 }
 
 static inline void mfrc522_spi_cs_deselect()
 {
     asm volatile("nop \n nop \n nop");
-    gpio_put(PIN_CS, 1);
+    gpio_put(mfrc522_cs_pin, 1);
     asm volatile("nop \n nop \n nop");
 }
 

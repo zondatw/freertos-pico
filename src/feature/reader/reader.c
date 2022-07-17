@@ -33,12 +33,11 @@ int main()
 void reader_task(void *p)
 {
     vTaskDelay(pdMS_TO_TICKS(2000));
-    mfrc522_init(1000000);
+    mfrc522_init(1000000, 2, 3, 4, 0, 1);
 
-    uint32_t valid_card_list[] = {
-        0x1B548050
-    };
-    int32_t valid_card_len = sizeof(valid_card_list) / sizeof(valid_card_list[0]);
+    uint32_t valid_card_list[] = {0x1B548050};
+    int32_t valid_card_len =
+        sizeof(valid_card_list) / sizeof(valid_card_list[0]);
 
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(200));
