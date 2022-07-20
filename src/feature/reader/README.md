@@ -1,5 +1,16 @@
 # Reader 
 
+## Layout
+
+| RC522 PIN | pin      | Description     |
+| --------  | -------  | --------------- |
+| 3.3v      | 3.3V     | 3.3V PWR        |
+| RST       | pin 1    | GP0 SPI0 RX     |
+| GND       | GND      | GND             |
+| MISO      | pin 6    | GP4 SPIO RX     |
+| MOSI      | pin 5    | GP3 SPIO TX     |
+| SCK       | pin 4    | GP2 SPIO SCLK   |
+| SDA       | pin 2    | GP1 SPIO CSn    |
 
 ## Reference
 
