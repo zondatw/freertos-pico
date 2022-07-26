@@ -8,6 +8,7 @@ and change FEATURE value which you want use, current supported:
 * `dummy`
 * `msg_queue`
 * `reader`
+* `flash_storage`
 
 ```shell
 mkdir build
