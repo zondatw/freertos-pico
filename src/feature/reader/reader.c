@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <task.h>
-#include "pico/stdlib.h"
 #include "hardware/spi.h"
+#include "pico/stdlib.h"
 
 #include "logger.h"
 #include "mfrc522.h"

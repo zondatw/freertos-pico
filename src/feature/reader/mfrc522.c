@@ -42,10 +42,10 @@ int mfrc522_init(spi_inst_t *spi_port,
     logger_debug(uart1, "[MFRC522 Init] spi init\r\n");
     spi_init(mfrc522_spi_port, baudrate);
 
-    spi_set_format(mfrc522_spi_port,    // SPI instance
-                   8,           // Number of bits per transfer
-                   SPI_CPOL_0,  // Polarity (CPOL)
-                   SPI_CPHA_0,  // Phase (CPHA)
+    spi_set_format(mfrc522_spi_port,  // SPI instance
+                   8,                 // Number of bits per transfer
+                   SPI_CPOL_0,        // Polarity (CPOL)
+                   SPI_CPHA_0,        // Phase (CPHA)
                    SPI_MSB_FIRST);
 
     logger_debug(uart1, "[MFRC522 Init] gpio seting\r\n");
