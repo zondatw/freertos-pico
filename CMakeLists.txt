@@ -20,6 +20,17 @@ project(freertos-pico C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+# set(TOOLCHAIN_PREFIX /usr/bin/)
+# execute_process(
+#   COMMAND which ${TOOLCHAIN_PREFIX}gcc
+#   OUTPUT_VARIABLE BINUTILS_PATH
+#   OUTPUT_STRIP_TRAILING_WHITESPACE
+# )
+
+# set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+# set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
+# set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+
 if (PICO_SDK_VERSION_STRING VERSION_LESS "1.3.0")
     message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.3.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
@@ -29,3 +40,4 @@ pico_sdk_init()
 
 add_subdirectory(freertos)
 add_subdirectory(src)
+add_subdirectory(tests)
