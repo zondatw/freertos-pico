@@ -5,12 +5,13 @@
 #include <task.h>
 #include "pico/stdlib.h"
 
-
 #include "logger.h"
 
 // We're going to erase and reprogram a region 256k from the start of flash.
 // Once done, we can access this at XIP_BASE + 256k.
 #define FLASH_TARGET_OFFSET (256 * 1024)
+
+void flash_storage_task(void *p);
 
 const uint8_t *flash_target_contents =
     (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);
@@ -40,42 +41,31 @@ int main()
     gpio_set_function(8, GPIO_FUNC_UART);
     gpio_set_function(9, GPIO_FUNC_UART);
 
-    sleep_ms(5000);
+    sleep_ms(2000);
     logger_info(uart1, "Start\r\n");
-    logger_info(uart1, "Read back target region:\r\n");
+    logger_info(uart1, "Read region:\r\n");
     print_buf(flash_target_contents, FLASH_PAGE_SIZE);
 
-    uint8_t random_data[FLASH_PAGE_SIZE];
-    for (int i = 0; i < FLASH_PAGE_SIZE; ++i)
-        random_data[i] = rand() >> 16;
-
-    logger_info(uart1, "Generated random data:\r\n");
-    print_buf(random_data, FLASH_PAGE_SIZE);
-    logger_info(uart1, "after Generated random data:\r\n");
-
-    // Note that a whole number of sectors must be erased at a time.
-    logger_info(uart1, "Erasing target region...\r\n");
-    flash_range_erase(FLASH_TARGET_OFFSET, FLASH_SECTOR_SIZE);
-    logger_info(uart1, "Done. Read back target region:\r\n");
-    print_buf(flash_target_contents, FLASH_PAGE_SIZE);
-
-    logger_info(uart1, "Programming target region...\r\n");
-    flash_range_program(FLASH_TARGET_OFFSET, random_data, FLASH_PAGE_SIZE);
-    logger_info(uart1, "Done. Read back target region:\r\n");
-    print_buf(flash_target_contents, FLASH_PAGE_SIZE);
-
-    bool mismatch = false;
-    for (int i = 0; i < FLASH_PAGE_SIZE; ++i) {
-        if (random_data[i] != flash_target_contents[i])
-            mismatch = true;
-    }
-    if (mismatch) {
-        logger_info(uart1, "Programming failed!\r\n");
-    } else {
-        logger_info(uart1, "Programming successful!\r\n");
-    }
+    xTaskCreate(flash_storage_task, "Flash Storage Task", 256, NULL, 1, NULL);
 
     vTaskStartScheduler();
     while (true)
         ;
+}
+
+void flash_storage_task(void *p)
+{
+    uint8_t buf[FLASH_PAGE_SIZE];
+    while (true) {
+        for (int i = 0; i < FLASH_PAGE_SIZE; ++i) {
+            memset(buf, i, FLASH_PAGE_SIZE);
+            flash_range_erase(FLASH_TARGET_OFFSET, FLASH_SECTOR_SIZE);
+            flash_range_program(FLASH_TARGET_OFFSET, buf, FLASH_PAGE_SIZE);
+
+            logger_info(uart1, "Value %u done. Read back target region:\r\n",
+                        buf[0]);
+            print_buf(flash_target_contents, FLASH_PAGE_SIZE);
+            vTaskDelay(pdMS_TO_TICKS(500));
+        }
+    }
 }
