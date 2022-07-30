@@ -96,7 +96,7 @@
 
 /* A header file that defines trace macro can be included here. */
 
-/* SLEEP PROCESSING */
+/* tickless mode */
 extern void preSleepProcessing(uint32_t ulExpectedTime);
 extern void postSleepProcessing(uint32_t ulExpectedTime);
 
