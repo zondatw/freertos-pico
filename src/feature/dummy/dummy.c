@@ -8,6 +8,9 @@ void led_task(void *p);
 
 void vApplicationIdleHook(void);
 
+void preSleepProcessing(uint32_t ulExpectedTime);
+void postSleepProcessing(uint32_t ulExpectedTime);
+
 struct led_params {
     int gpio_pin;
     int on_delay;
@@ -58,6 +61,32 @@ void vApplicationIdleHook(void)
     count++;
     if (count == 1000) {
         printf("[IDLE] HOOK\n");
+        count = 0;
+    }
+}
+
+void preSleepProcessing(uint32_t ulExpectedTime)
+{
+    /*
+    set configUSE_TICKLESS_IDLE to 1
+    */
+    static int32_t count = 0;
+    count++;
+    if (count == 1000) {
+        printf("[SLEEP] pre: %d\n", ulExpectedTime);
+        count = 0;
+    }
+}
+
+void postSleepProcessing(uint32_t ulExpectedTime)
+{
+    /*
+    set configUSE_TICKLESS_IDLE to 1
+    */
+    static int32_t count = 0;
+    count++;
+    if (count == 1000) {
+        printf("[SLEEP] post: %d\n", ulExpectedTime);
         count = 0;
     }
 }
