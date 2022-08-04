@@ -38,16 +38,16 @@
 #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP 0
 
 /* Hook function related definitions. */
-#define configUSE_IDLE_HOOK                     1
+#define configUSE_IDLE_HOOK                     0 // for vApplicationIdleHook
 #define configUSE_TICK_HOOK                     0
 #define configCHECK_FOR_STACK_OVERFLOW          0
 #define configUSE_MALLOC_FAILED_HOOK            0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 
 /* Run time and task stats gathering related definitions. */
-#define configGENERATE_RUN_TIME_STATS           0
-#define configUSE_TRACE_FACILITY                0
-#define configUSE_STATS_FORMATTING_FUNCTIONS    0
+#define configGENERATE_RUN_TIME_STATS           1
+#define configUSE_TRACE_FACILITY                1
+#define configUSE_STATS_FORMATTING_FUNCTIONS    1
 
 /* Co-routine related definitions. */
 #define configUSE_CO_ROUTINES                   0
@@ -102,4 +102,10 @@ extern void postSleepProcessing(uint32_t ulExpectedTime);
 
 #define configPRE_SLEEP_PROCESSING preSleepProcessing
 #define configPOST_SLEEP_PROCESSING postSleepProcessing
+
+/* tracing  */
+extern volatile unsigned long ulHighFrequencyTimerTicks;
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ( ulHighFrequencyTimerTicks = 100UL )
+#define portGET_RUN_TIME_COUNTER_VALUE() ulHighFrequencyTimerTicks
+
 #endif /* FREERTOS_CONFIG_H */

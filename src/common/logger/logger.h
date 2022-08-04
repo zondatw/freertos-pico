@@ -2,6 +2,7 @@
 #define COMMON_LOGGER_H
 
 #include <stdarg.h>
+#include <stdint.h>
 #include "pico/stdlib.h"
 
 enum {
