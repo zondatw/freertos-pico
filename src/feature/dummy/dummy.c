@@ -17,7 +17,9 @@ void postSleepProcessing(uint32_t ulExpectedTime);
 
 #define MAX_TASK_NUM 10
 TaskStatus_t pxTaskStatusArray[MAX_TASK_NUM];
-volatile unsigned long ulHighFrequencyTimerTicks = 1000;
+volatile unsigned long ulHighFrequencyTimerTicks = 0ul;
+void configureTimerForRunTimeStats(void);
+unsigned long getRunTimeCounterValue(void);
 
 struct led_params {
     int gpio_pin;
@@ -181,4 +183,14 @@ void monitor_task(void *p)
             count = 0;
         }
     }
+}
+
+void configureTimerForRunTimeStats(void)
+{
+    ulHighFrequencyTimerTicks = 0ul;
+}
+
+unsigned long getRunTimeCounterValue(void)
+{
+    return ulHighFrequencyTimerTicks;
 }

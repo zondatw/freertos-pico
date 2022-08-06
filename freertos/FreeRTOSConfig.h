@@ -105,7 +105,9 @@ extern void postSleepProcessing(uint32_t ulExpectedTime);
 
 /* tracing  */
 extern volatile unsigned long ulHighFrequencyTimerTicks;
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() ( ulHighFrequencyTimerTicks = 100UL )
-#define portGET_RUN_TIME_COUNTER_VALUE() ulHighFrequencyTimerTicks
+extern void configureTimerForRunTimeStats(void);
+extern unsigned long getRunTimeCounterValue(void);
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() configureTimerForRunTimeStats();
+#define portGET_RUN_TIME_COUNTER_VALUE() getRunTimeCounterValue();
 
 #endif /* FREERTOS_CONFIG_H */
